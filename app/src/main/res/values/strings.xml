@@ -1,0 +1,10 @@
+<resources>
+	<string name="app_name">Icing - Legacy</string>
+	<string-array name="drawer_items">
+		<item>Movies</item>
+		<item>Sources</item>
+		<item>Servers</item>
+	</string-array>
+	<string name="drawer_expand_description">Open Navigation Drawer</string>
+	<string name="drawer_close_description">Close Navigation Drawer</string>
+</resources>
