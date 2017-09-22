@@ -1,0 +1,35 @@
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+											 xmlns:app="http://schemas.android.com/apk/res-auto"
+											 xmlns:tools="http://schemas.android.com/tools"
+											 android:id="@+id/frameLayout"
+											 android:layout_width="match_parent"
+											 android:layout_height="match_parent"
+											 tools:context="enterprises.mccollum.home.icing_legacy.servers.ServersFragment"
+											 tools:layout_editor_absoluteX="0dp"
+											 tools:layout_editor_absoluteY="81dp">
+	
+	<android.support.v7.widget.ListViewCompat
+		android:id="@+id/servers_list_view"
+		android:layout_width="0dp"
+		android:layout_height="0dp"
+		android:layout_marginBottom="8dp"
+		android:layout_marginEnd="8dp"
+		android:layout_marginStart="8dp"
+		android:layout_marginTop="8dp"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/new_server_button">
+	</android.support.v7.widget.ListViewCompat>
+	
+	<Button
+		android:id="@+id/new_server_button"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginEnd="8dp"
+		android:layout_marginTop="8dp"
+		android:text="New"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintTop_toTopOf="parent"/>
+
+</android.support.constraint.ConstraintLayout>

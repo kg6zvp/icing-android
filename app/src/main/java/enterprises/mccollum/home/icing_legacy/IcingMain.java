@@ -1,10 +1,10 @@
 package enterprises.mccollum.home.icing_legacy;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -66,13 +66,11 @@ public class IcingMain extends AppCompatActivity {
 	}
 	
 	private void makeSelection(Integer selection) {
-		Fragment fragment = null;
-		switch(selection){
-			case 0:
-			default:
-		}
+		System.out.println("Selection: " + selection);
+		Fragment fragment = navigationViewModel.getSelectedFragment();
+		
 		if(fragment != null) {
-			FragmentManager fragmentManager = getFragmentManager();
+			FragmentManager fragmentManager = getSupportFragmentManager();
 			fragmentManager.beginTransaction()
 					.replace(R.id.content_frame, fragment)
 					.commit();//*/
