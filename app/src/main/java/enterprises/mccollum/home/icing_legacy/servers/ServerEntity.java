@@ -32,6 +32,12 @@ public class ServerEntity {
 		return url;
 	}
 	public void setUrl(String url) {
+		if(!url.startsWith("http://") && !url.startsWith("https://"))
+			url = "http://" + url;
+		
+		if(!url.endsWith("/"))
+			url = url + "/";
+		
 		this.url = url;
 	}
 }

@@ -42,10 +42,6 @@ dependencies {
 	implementation 'com.android.support:appcompat-v7:' + rootProject.supportLibVersion
 	implementation 'com.android.support.constraint:constraint-layout:1.0.2'
 	implementation 'com.android.support:support-v4:26.1.0'
-	testImplementation 'junit:junit:4.12'
-	androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
-		exclude group: 'com.android.support', module: 'support-annotations'
-	})
 	implementation 'com.android.support:support-core-utils:' + rootProject.supportLibVersion
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 	implementation 'android.arch.lifecycle:extensions:' + rootProject.archLifecycleVersion
@@ -61,4 +57,11 @@ dependencies {
 
 	implementation 'com.google.dagger:dagger-android-support:2.11' // if you use the support libraries
 	annotationProcessor 'com.google.dagger:dagger-android-processor:2.11'
+
+	//test
+	testImplementation 'org.robolectric:robolectric:3.3.2'
+	testImplementation 'junit:junit:4.12'
+	androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
+		exclude group: 'com.android.support', module: 'support-annotations'
+	})
 }

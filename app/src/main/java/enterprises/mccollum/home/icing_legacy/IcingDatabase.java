@@ -6,6 +6,7 @@ import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
 import enterprises.mccollum.home.icing_legacy.servers.ServerDao;
+import enterprises.mccollum.home.icing_legacy.servers.ServerDaoWrapper;
 import enterprises.mccollum.home.icing_legacy.servers.ServerEntity;
 
 /**
@@ -13,8 +14,20 @@ import enterprises.mccollum.home.icing_legacy.servers.ServerEntity;
  */
 @Database(entities = {ServerEntity.class}, version = 1)
 public abstract class IcingDatabase extends RoomDatabase {
+	private static ServerDao serverDao = null;
+	
 	public static IcingDatabase get(Context ctx){
 		return Room.databaseBuilder(ctx.getApplicationContext(), IcingDatabase.class, "icing_db").build();
 	}
-	public abstract ServerDao serverDao();
+	public abstract ServerDao getServerDao();
+	
+	public ServerDao serverDao(){
+		if(serverDao == null)
+			serverDao = getServerDao();
+		return serverDao;
+	}
+	
+	public ServerDaoWrapper serverDaoWrapper(){
+		return new ServerDaoWrapper(serverDao());
+	}
 }

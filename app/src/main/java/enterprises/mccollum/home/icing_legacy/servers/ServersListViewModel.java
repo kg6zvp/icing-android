@@ -17,11 +17,13 @@ public class ServersListViewModel extends AndroidViewModel {
 	IcingDatabase db;
 	
 	ServerDao serverDao;
+	ServerDaoWrapper serverDaoWrapper;
 	
 	public ServersListViewModel(Application application){
 		super(application);
 		db = IcingDatabase.get(application);
 		serverDao = db.serverDao();
+		serverDaoWrapper = db.serverDaoWrapper();
 		serversLiveData = serverDao.getAll();
 	}
 	
@@ -31,5 +33,9 @@ public class ServersListViewModel extends AndroidViewModel {
 	
 	public LiveData<List<Server>> getServersList(){
 		return serversLiveData;
+	}
+	
+	public ServerDaoWrapper serverDaoWrapper() {
+		return serverDaoWrapper;
 	}
 }

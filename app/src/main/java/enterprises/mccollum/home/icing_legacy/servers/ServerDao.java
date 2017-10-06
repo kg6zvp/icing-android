@@ -10,6 +10,8 @@ import android.arch.persistence.room.Update;
 
 import java.util.List;
 
+import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
+
 /**
  * Created by smccollum on 9/22/17.
  */
@@ -24,10 +26,13 @@ public interface ServerDao {
 	@Query("SELECT * from server WHERE id = :id LIMIT 1")
 	LiveData<Server> get(long id);
 	
+	@Query("SELECT * from server WHERE id = :id LIMIT 1")
+	LiveData<ServerEntity> getRaw(long id);
+	
 	@Query("SELECT * from server where name = :name LIMIT 1")
 	LiveData<Server> getByName(String name);
 	
-	@Insert
+	@Insert(onConflict = REPLACE)
 	Long[] insert(ServerEntity...servers);
 	
 	@Update
@@ -35,4 +40,7 @@ public interface ServerDao {
 	
 	@Delete
 	void delete(ServerEntity...servers);
+	
+	@Query("DELETE from server where id = :id")
+	void delete(Long id);
 }
