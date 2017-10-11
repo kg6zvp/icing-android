@@ -8,7 +8,6 @@
 	<string name="drawer_expand_description">Open Navigation Drawer</string>
 	<string name="drawer_close_description">Close Navigation Drawer</string>
 	
-	<string name="hello_blank_fragment">Hello blank fragment</string>
 	<string name="must_include_server_name">Must include a name</string>
 	<string name="must_include_server_hostname">Cannot save server without a hostname</string>
 	<string name="use_https">Use HTTPS</string>
@@ -23,4 +22,5 @@
 	<string name="hostname_must_not_be_url">Cannot be a URL</string>
 	<string name="srvr_hostname_hint">hostname[:port] or IP[:port]</string>
 	<string name="invalid_port">Invalid port %s</string>
+	<string name="please_add_at_least_one_server">Please add at least one Icing server</string>
 </resources>

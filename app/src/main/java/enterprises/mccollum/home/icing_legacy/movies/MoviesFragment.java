@@ -1,9 +1,7 @@
 package enterprises.mccollum.home.icing_legacy.movies;
 
-
-import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,15 +12,12 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import java.util.Collections;
-import java.util.List;
 
 import enterprises.mccollum.home.icing_legacy.IcingApi;
-import enterprises.mccollum.home.icing_legacy.IcingDatabase;
 import enterprises.mccollum.home.icing_legacy.R;
 import enterprises.mccollum.home.icing_legacy.ResponseWrapper;
 import enterprises.mccollum.home.icing_legacy.movies.view.MovieListAdapter;
 import enterprises.mccollum.home.icing_legacy.servers.Server;
-import enterprises.mccollum.home.icing_legacy.servers.ServerDao;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -37,6 +32,8 @@ public class MoviesFragment extends Fragment implements SwipeRefreshLayout.OnRef
 	
 	MovieListAdapter movieListAdapter;
 	
+	MoviesListViewModel moviesListViewModel;
+	
 	public MoviesFragment() {
 		// Required empty public constructor
 	}
@@ -49,6 +46,8 @@ public class MoviesFragment extends Fragment implements SwipeRefreshLayout.OnRef
 		refreshLayout = v.findViewById(R.id.movies_swipe_refresh_layout);
 		refreshLayout.setOnRefreshListener(this);
 		
+		moviesListViewModel = ViewModelProviders.of(this).get(MoviesListViewModel.class);
+		
 		movieListAdapter = new MovieListAdapter(getContext());
 		moviesList = v.findViewById(R.id.movies_list);
 		moviesList.setAdapter(movieListAdapter);
@@ -60,59 +59,60 @@ public class MoviesFragment extends Fragment implements SwipeRefreshLayout.OnRef
 	}
 	
 	private void subscribe() {
-		refreshLayout.setRefreshing(true);
-		IcingDatabase db = IcingDatabase.get(getContext());
-		ServerDao serverDao = db.serverDao();
-		serverDao.getAll().observe(this, new Observer<List<Server>>() {
-			@Override
-			public void onChanged(@Nullable List<Server> servers) {
-				if(servers.size() != 1){
-					System.out.println("Servers.size != 1: "+ servers.size());
-					if(servers.size() < 1) {
-						Toast.makeText(getContext(), "Please add an icing server on the Servers screen", Toast.LENGTH_SHORT).show();
-					}
-					if(servers.size() > 1) {
-						Toast.makeText(getContext(), "Please remove an icing server (only 1 supported)", Toast.LENGTH_SHORT).show();
-					}
-					refreshLayout.setRefreshing(false);
-					return;
-				}
-				final Server server = servers.get(0);
-				
-				try {
-					IcingApi.getMovies(server.getUrl())
-							.getAll().enqueue(new Callback<ResponseWrapper<MovieFile>>() {
-						@Override
-						public void onResponse(Call<ResponseWrapper<MovieFile>> call, Response<ResponseWrapper<MovieFile>> response) {
-							System.out.println("URL: " + call.request().url().toString());
-							
-							System.out.println("code: " + response.code());
-							
-							System.out.println("movies: " + response.body().getSize());
-							ResponseWrapper<MovieFile> movies = response.body();
-							Collections.sort(movies.getData());
-							for(MovieFile movie : movies.getData()){
-								movie.getSource().setServer(server);
-							}
-							movieListAdapter.setMovieFiles(movies.getData());
-							refreshLayout.setRefreshing(false);
-						}
-						
-						@Override
-						public void onFailure(Call<ResponseWrapper<MovieFile>> call, Throwable t) {
-							System.err.println("Error getting movies from server");
-							t.printStackTrace();
-						}
-					});
-				}catch (Exception e){
-					e.printStackTrace();
-				}
+		moviesListViewModel.getServersLiveData().observe(this, servers -> {
+			if(servers.size() > 0) {
+				refreshMovielist();
+			} else {
+				refreshLayout.setRefreshing(false);
 			}
+		});
+		
+		moviesListViewModel.getMoviesLiveData().observe(this, movieFiles -> {
+			movieListAdapter.setMovieFiles(movieFiles);
+			refreshLayout.setRefreshing(false);
 		});
 	}
 	
 	@Override
 	public void onRefresh() {
-		subscribe();
+		refreshMovielist();
+	}
+	
+	private void refreshMovielist(){
+		if(moviesListViewModel.getServersLiveData().getValue().size() < 1) {
+			Toast.makeText(getContext(), R.string.please_add_at_least_one_server, Toast.LENGTH_LONG).show();
+			refreshLayout.setRefreshing(false);
+			return;
+		}
+		for(Server curServer : moviesListViewModel.getServersLiveData().getValue()) {
+			final Server server = curServer;
+			
+			try {
+				IcingApi.getMovies(server.getUrl())
+						.getAll().enqueue(new Callback<ResponseWrapper<MovieFile>>() {
+					@Override
+					public void onResponse(Call<ResponseWrapper<MovieFile>> call, Response<ResponseWrapper<MovieFile>> response) {
+						ResponseWrapper<MovieFile> movies = response.body();
+						Collections.sort(movies.getData());
+						for (MovieFile movie : movies.getData()) {
+							movie.getSource().setServer(server);
+						}
+						
+						moviesListViewModel.getMoviesLiveData().setValue(movies.getData());
+						refreshLayout.setRefreshing(false);
+					}
+					
+					@Override
+					public void onFailure(Call<ResponseWrapper<MovieFile>> call, Throwable t) {
+						System.err.println("Error getting movies from server");
+						t.printStackTrace();
+						refreshLayout.setRefreshing(false);
+					}
+				});
+			} catch (Exception e) {
+				e.printStackTrace();
+				refreshLayout.setRefreshing(false);
+			}
+		}
 	}
 }
