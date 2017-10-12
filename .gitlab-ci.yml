@@ -1,0 +1,43 @@
+image: 'thyrlian/android-sdk'
+
+stages:
+  - build
+  - test
+  - deploy
+
+before_script:
+#  - echo `pwd` # debug
+#  - echo "$CI_BUILD_NAME, $CI_BUILD_REF_NAME $CI_BUILD_STAGE" # debug
+  - sdkmanager "ndk-bundle" # install android ndk
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+
+cache:
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+
+build:
+  stage: build
+  script:
+    - ./gradlew assembleDebug
+  artifacts:
+    paths:
+      - app/build/outputs/logs/*
+      - app/build/outputs/apk/*
+      - app/schemas/*
+    expire_in: 1 week
+
+test:
+  stage: test
+  script:
+    - ./gradlew check
+
+deploy:
+  stage: deploy
+  script:
+    - ./deploy
+  only:
+    - master
+
+after_script:
+  - echo "End CI"
