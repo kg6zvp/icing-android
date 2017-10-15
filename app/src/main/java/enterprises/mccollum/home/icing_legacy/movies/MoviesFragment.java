@@ -50,6 +50,7 @@ public class MoviesFragment extends Fragment implements SwipeRefreshLayout.OnRef
 		
 		movieListAdapter = new MovieListAdapter(getContext());
 		moviesList = v.findViewById(R.id.movies_list);
+		moviesList.setHasFixedSize(true); //improves scroll performance
 		moviesList.setAdapter(movieListAdapter);
 		moviesList.setLayoutManager(new LinearLayoutManager(getContext()));
 		
