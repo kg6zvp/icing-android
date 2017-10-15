@@ -46,6 +46,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieViewHolder> {
 		holder.movieTitle.setText(movie.getTitleWithYear());
 		
 		//actually get the poster
+		holder.setDefaultImage();
 		holder.moviePoster.setImageUrl("https://image.tmdb.org/t/p/w342/" + movie.getMetaData().getPoster_path(),
 				ImageFetch.getImageLoader(ctx));
 		

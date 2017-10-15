@@ -22,6 +22,8 @@ public class MovieViewHolder extends RecyclerView.ViewHolder {
 	public NetworkImageView moviePoster;
 	public View view;
 	
+	public static final int defaultLoadingImage = android.R.drawable.ic_menu_recent_history;
+	
 	public MovieViewHolder(View itemView) {
 		super(itemView);
 		
@@ -29,6 +31,10 @@ public class MovieViewHolder extends RecyclerView.ViewHolder {
 		
 		movieTitle = itemView.findViewById(R.id.movie_title);
 		moviePoster = itemView.findViewById(R.id.movie_poster);
-		moviePoster.setDefaultImageResId(android.R.drawable.ic_menu_recent_history);
+		setDefaultImage();
+	}
+	
+	public void setDefaultImage(){
+		moviePoster.setDefaultImageResId(defaultLoadingImage);
 	}
 }
