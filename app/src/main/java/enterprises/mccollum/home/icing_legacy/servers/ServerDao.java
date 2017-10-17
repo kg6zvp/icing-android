@@ -1,6 +1,5 @@
 package enterprises.mccollum.home.icing_legacy.servers;
 
-import android.arch.lifecycle.LifecycleFragment;
 import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;

@@ -16,6 +16,7 @@
 	<string name="app_server">App Server</string>
 	<string name="custom_ctx">Custom Context</string>
 	<string name="custom_ctx_hint">context (ie: /media)</string>
+	<string name="custom_ctx_must_start_with_slash">Must begin with a /</string>
 	<string name="new_server">New Server</string>
 	<string name="edit_server">Edit Server</string>
 	<string name="server_saved_successfully">Server saved successfully</string>

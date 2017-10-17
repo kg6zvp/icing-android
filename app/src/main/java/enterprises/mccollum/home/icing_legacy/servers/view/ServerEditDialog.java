@@ -25,6 +25,7 @@ import enterprises.mccollum.home.icing_legacy.servers.ServerEntity;
  */
 public class ServerEditDialog extends Dialog implements View.OnClickListener {
 	LifecycleOwner lifecycleOwner;
+	boolean edit;
 	ServerEntity server;
 	
 	final EditText nameField;
@@ -45,9 +46,12 @@ public class ServerEditDialog extends Dialog implements View.OnClickListener {
 	public ServerEditDialog(LifecycleOwner lifecycleOwner, @NonNull Context context, ServerEntity server) {
 		super(context, R.style.AppDialog);
 		
+		edit = true;
 		this.server = server;
-		if(server == null)
+		if(server == null) {
+			edit = false;
 			this.server = new ServerEntity();
+		}
 		
 		this.lifecycleOwner = lifecycleOwner;
 		
@@ -88,33 +92,29 @@ public class ServerEditDialog extends Dialog implements View.OnClickListener {
 		
 		//Save btn
 		saveBtn.setOnClickListener(this);
+		
+		restoreStateFromSaved();
 	}
 	
-	boolean validPort(String hostname) {
-		if(!hostname.contains(":"))
-			return true;
-		return hostname.substring(hostname.indexOf(':')).matches("[0-9]*");
-	}
-	
-	String buildServerUrl(){
-		StringBuilder urlBuilder = new StringBuilder(60);
-		urlBuilder.append(httpsCbx.isChecked() ? "https://" : "http://"); //protocol
-		urlBuilder.append(hostField.getText().toString());
-		if(standaloneServerRdo.isChecked()){
-			//standalone
-			urlBuilder.append("/");
-		}else {
-			//app server
-			if(customCtxCbx.isChecked()){
-				String customCtx = customCtxTxt.getText().toString();
-				if(!customCtx.startsWith("/"))
-					urlBuilder.append('/');
-				urlBuilder.append(customCtx);
-			}else{
-				urlBuilder.append("/media");
+	private void restoreStateFromSaved(){
+		if(!edit)
+			return;
+		
+		nameField.setText(server.getName());
+		
+		hostField.setText(server.getHostnamePort());
+		
+		httpsCbx.setChecked(server.getUseHttps());
+		
+		if(server.isStandaloneContext()){
+			standaloneServerRdo.setChecked(true);
+		}else{
+			appServerRdo.setChecked(true);
+			if(server.isCustomContext()){
+				customCtxCbx.setChecked(true);
+				customCtxTxt.setText(server.getContext());
 			}
 		}
-		return urlBuilder.toString();
 	}
 	
 	//SAVE
@@ -124,30 +124,54 @@ public class ServerEditDialog extends Dialog implements View.OnClickListener {
 		if(TextUtils.isEmpty(nameField.getText().toString())){
 			nameField.setError(getContext().getString(R.string.must_include_server_name));
 			return;
+		}else{
+			nameField.setError(null);
+			server.setName(nameField.getText().toString());
 		}
 		
-		//hostname validations
-		String hostname = hostField.getText().toString();
-		if(TextUtils.isEmpty(hostname)){
+		//hostname validation
+		String hostnamePort = hostField.getText().toString();
+		if(TextUtils.isEmpty(hostnamePort)){
 			hostField.setError(getContext().getString(R.string.must_include_server_hostname));
 			return;
-		}else if(hostname.contains("/")){
+		}else if(hostnamePort.contains("/")){
 			hostField.setError(getContext().getString(R.string.hostname_must_not_be_url));
 			return;
-		}else if(!validPort(hostname)){
+		}else if(!server.validPort()){
 			hostField.setError(
 					String.format(
 							getContext().getString(R.string.invalid_port),
-							hostname.substring(hostname.indexOf(':'))
+							hostnamePort.substring(hostnamePort.indexOf(':'))
 					)
 			);
 			return;
+		}else{
+			hostField.setError(null);
+			server.setHostnamePort(hostnamePort);
 		}
-		server.setName(nameField.getText().toString());
-		String serverUrl = buildServerUrl();
-		System.out.println("url: " + serverUrl);
-		server.setUrl(serverUrl);
 		
+		//set HTTP or HTTPS
+		server.setUseHttps(httpsCbx.isChecked());
+		
+		//set context
+		if(standaloneServerRdo.isChecked()){ //if use standalone
+			server.setStandaloneContext();
+		}else if(appServerRdo.isChecked()){
+			if(!customCtxCbx.isChecked()){ //if use default
+				server.setDefaultContext();
+			}else{
+				String serverContext = customCtxTxt.getText().toString();
+				if(TextUtils.isEmpty(serverContext)){
+					server.setDefaultContext();
+				}else if(!serverContext.startsWith("/")){
+					customCtxTxt.setError(getContext().getString(R.string.custom_ctx_must_start_with_slash));
+				}else{
+					server.setCustomContext(serverContext);
+				}
+			}
+		}
+		
+		System.out.println("Server: " + server.toString());
 		LiveData<List<Long>> rKeys = IcingDatabase.get(getContext()).serverDaoWrapper().insertAsync(server);
 		final Context ctx = getContext();
 		rKeys.observe(lifecycleOwner, (keys) -> {
