@@ -28,6 +28,15 @@ public class ServerDaoWrapper {
 		return keys;
 	}
 	
+	public void updateAsync(ServerEntity...servers){
+		HandlerThread ht = new HandlerThread("");
+		ht.start();
+		Handler h = new Handler(ht.getLooper());
+		h.post(() -> {
+			serverDao.update(servers);
+		});
+	}
+	
 	public void deleteAsync(Server... servers){
 		HandlerThread ht = new HandlerThread("");
 		ht.start();

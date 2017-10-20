@@ -1,6 +1,6 @@
 package enterprises.mccollum.home.icing_legacy.servers;
 
-import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
@@ -52,10 +52,14 @@ public class ServersFragment extends Fragment {
 		
 		adapter = new ServerItemAdapter(getContext());
 		listView.setAdapter(adapter);
+		
 		listView.setOnItemClickListener((adapterView, view, i, l) -> {
-			/*Server s = adapter.getItem(i);
-			serversListViewModel.serverDao().getRaw(s.getId()).observe(this, serverEntity -> {
+			System.out.println("edit " + i);
+			Server s = adapter.getItem(i);
+			final LiveData<ServerEntity> serverEntityLiveData = serversListViewModel.serverDao().getRaw(s.getId());
+			serverEntityLiveData.observe(this, serverEntity -> {
 				new ServerEditDialog(this, getContext(), serverEntity).show();
+				serverEntityLiveData.removeObservers(this);
 			});//*/
 		});
 		listView.setOnItemLongClickListener((adapterView, view, i, l) -> {
@@ -70,11 +74,11 @@ public class ServersFragment extends Fragment {
 	}
 	
 	private void subscribe() {
-		final ServerItemAdapter adpr = adapter;
+		final ServerItemAdapter adptr = adapter;
 		serversListViewModel.getServersList().observe(this, servers -> {
-			adpr.clear();
-			adpr.addAll(servers);
-//			adpr.notifyDataSetChanged();
+			adptr.clear();
+			adptr.addAll(servers);
+//			adptr.notifyDataSetChanged();
 		});
 	}
 	
