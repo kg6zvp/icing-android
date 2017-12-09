@@ -32,6 +32,6 @@ ext {
     runnerVersion = "0.5"
     rulesVersion = "0.5"
     espressoVersion = "2.2.2"
-    archLifecycleVersion = "1.0.0-alpha9-1"
-    archRoomVersion = "1.0.0-alpha9-1"
+    archLifecycleVersion = "1.0.0"
+    archRoomVersion = "1.0.0"
 }
