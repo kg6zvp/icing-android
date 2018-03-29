@@ -8,8 +8,9 @@ stages:
 before_script:
 #  - echo `pwd` # debug
 #  - echo "$CI_BUILD_NAME, $CI_BUILD_REF_NAME $CI_BUILD_STAGE" # debug
-  - sdkmanager "ndk-bundle" # install android ndk
-  - export GRADLE_USER_HOME=`pwd`/.gradle
+  - apt-get update && apt-get install --yes git
+#  - sdkmanager "ndk-bundle" # install android ndk
+#  - export GRADLE_USER_HOME=`pwd`/.gradle
 
 cache:
   paths:
@@ -19,7 +20,8 @@ cache:
 build:
   stage: build
   script:
-    - ./gradlew assembleDebug
+     - echo "build"
+#    - ./gradlew assembleDebug
   artifacts:
     paths:
       - app/build/outputs/logs/*
@@ -30,12 +32,20 @@ build:
 test:
   stage: test
   script:
-    - ./gradlew check
+     - echo "test"
+#    - ./gradlew check
 
 deploy:
   stage: deploy
   script:
-    - ./deploy
+    - git clone "$CI_REPOSITORY_URL" icing-android
+    - cd icing-android
+    - git config user.email "kg6zvp@gmail.com"
+    - git config --global user.name "Sam McCollum"
+    - git remote add github "https://kg6zvp:$GITHUB_PERSONAL_ACCESS_TOKEN@github.com/kg6zvp/icing-android.git"
+    - git push --force --follow-tags github master
+    - cd ..
+    - rm -rf icing-android
   only:
     - master
 
